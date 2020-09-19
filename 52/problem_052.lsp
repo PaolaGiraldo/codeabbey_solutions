@@ -1,0 +1,15 @@
+(defun read-data (&optional (read-line))
+  (declare (ignore read-line))
+  (let (*read-eval*)
+      (loop :for line = (read-line nil nil)
+            :while line
+            :collect (read-from-string (concatenate 'string "(" line ")")))))
+(defvar data)
+(defvar legs)
+(setq data (cdr (read-data)))
+(dolist (item data)
+  (setq legs (+ (expt (first item) 2) (expt (second item) 2)))
+  (COND ((> legs (expt (third item) 2)) (print 'A))
+    ((< legs (expt (third item) 2)) (print 'O))
+    (T (print 'R))))
+

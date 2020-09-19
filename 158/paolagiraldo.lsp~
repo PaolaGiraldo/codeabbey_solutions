@@ -1,0 +1,118 @@
+#|$ sblint -v paolagiraldo.lsp
+[INFO] Lint file paolagiraldo.lsp
+
+$ clisp -c paolagiraldo.lsp
+Compiling file /home/../paolagiraldo.lsp ...
+Wrote file /home/../paolagiraldo.fas
+0 errors, 0 warnings
+Bye.
+|#
+
+(defun read-data (&optional (read-line))
+  (declare (ignore read-line))
+  (let (*read-eval*)
+    (loop :for line = (read-line nil nil)
+    :while line
+    :collect (read-from-string (concatenate 'string "("
+      (write-to-string line) ")" )))))
+
+
+(defun number-to-list (n)    
+  (loop for c across (write-to-string n) collect (digit-char-p c)))
+
+(defun make-index (pos length)
+  (loop :for n :from pos :below length :by (* (1+ pos) 2)
+    :collect n))
+
+
+(defun add-parity-bits (numList)
+  (let ((new ()) (i 1) (numList))
+    (loop while numList do
+      (if (integerp (log i 2))
+        (setq new (append new '(_)))
+        (progn
+          (setq new (append new (list (first numList))))
+          (setq numList (cdr numList))))
+          (setq i (1+ i)))
+    (block nil
+      (return new))))
+
+(defun calc-bit (parity)
+  (let ((bit) (list) (index) (end))
+    (dotimes (pos (length parity))
+      (if (integerp (log (1+ pos) 2))
+        (progn
+          (setq index (make-index pos (length parity)))
+            (setq list ())
+            (dolist (ind index)
+              (setq end (+ ind (1+ pos)))
+              (if (< end (length parity))
+                (setq list (append list (subseq parity ind end )))
+                (setq list (append list (subseq parity ind)))))
+
+          (if (evenp (count 1 list))
+            (setf (nth pos parity) 0)
+            (setf (nth pos parity) 1)))))
+    ;;(format nil "~{~a~}" parity)
+    (block nil
+      (return parity))
+    ))
+
+(defun encode (lst)
+  (let ((parity) (numList))
+  (dolist (num lst)
+    (setq numList (delete nil (number-to-list (first num))))
+    (setq parity (add-parity-bits numList))
+    (calc-bit parity))))
+
+(defun check (lst)
+  ;;(print lst)
+  (let ((numList) (parity))
+    
+    (dolist (num lst)
+      (setq numList (delete nil (number-to-list (first num))))
+      ;;(print (parse-integer (first num) :radix 10))
+      (print numList)
+      (setq aux (copy-list numList))
+      ;;(format T "~%~{~A~}" numList)
+      (setq parity (calc-bit numList))
+      (print parity)
+      ;;(print '---------------------)
+      (print aux)
+       (dotimes (i (length numList))
+	;;(print i)
+	;;(print numList)
+	;;(print parity)
+	;;(princ (nth i aux))
+	;;(princ (nth i parity))
+	
+
+      (if (= (nth i aux) (nth i parity) )
+	    (princ 0)
+	    (princ 1)))
+
+      
+       (print '---)
+       ;;(print aux)
+
+      
+  )
+  ))
+
+
+(defun hamming-code (data)
+  (let ((numEncode) (toEncode) (toCheck))
+    (setq numEncode (parse-integer (caar data)))
+    (setq toEncode (subseq (cdr data) 0 numEncode))
+    (setq toCheck (subseq data (+ numEncode 2)))
+    ;;(encode toEncode)
+    (check toCheck)))
+
+(defvar data)
+(setq data (read-data))
+(hamming-code data)
+
+#|
+$ cat DATA.lst | clisp paolagiraldo.lsp
+
+|#

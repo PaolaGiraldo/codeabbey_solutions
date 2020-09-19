@@ -1,0 +1,58 @@
+#|$ sblint -v paolagiraldo.lsp
+[INFO] Lint file paolagiraldo.lsp
+
+$ clisp -c paolagiraldo.lsp
+Compiling file /home/../paolagiraldo.lsp ...
+Wrote file /home/../paolagiraldo.fas
+0 errors, 0 warnings
+Bye.
+|#
+
+(defun read-data (&optional (read-line))
+  (declare (ignore read-line))
+  (let (*read-eval*)
+    (loop :for line = (read-line nil nil)
+    :while line
+    :collect (read-from-string (concatenate 'string "(" line ")" )))))
+
+(defun count-str (a L)
+  (cond
+    ((null L) 0)
+    ((eq a (car L)) (+ 1 (count-str a (cdr L))))
+    (t (count-str a (cdr L)))))
+
+(defun list-to-string (lst)
+  (format nil "~{~A ~}" lst))
+
+(defun entropy-calc (data)
+  (let ((str) (strList) (len) (count) (freq) (value) (entropy))
+  (dolist (phrase data)
+    (setq str (list-to-string phrase))
+    (setq strList (coerce str 'list))
+    (setq strList (reverse (cdr (reverse strList))))
+    (setq len (length strList))
+    (setq entropy 0)
+    (dolist (letter strList)
+      (declare (ignore letter))
+      (if strList
+      (progn
+        (setq count (count-str (first strList) strList))
+        (setq freq (coerce (/ count len) 'double-float))
+        (setq strList (delete (first strList) strList))
+        (setq value (* freq (* -1 (log freq 2))))
+        (setq entropy (+ entropy value)))))
+
+    (format T "~%~F" entropy))))
+
+(defvar data)
+(setq data (cdr (read-data)))
+(entropy-calc data)
+
+#|
+$ cat DATA.lst | clisp paolagiraldo.lsp
+3.246439344671016 3.9056390622295662 3.1037016960573482 3.2733494559629492
+3.5736606896881855 3.565448371820825 3.3263604079526936 3.513269689515108
+3.32323142879762 3.1158340921632197 3.6128786893420304 3.1018812234760182
+3.861983513035609 2.649397470347699 3.594465636961451 3.3263604079526936
+3.605388542207534 3.5726236638951634 3.1556390622295662d0
+|#

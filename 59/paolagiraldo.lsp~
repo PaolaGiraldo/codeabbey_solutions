@@ -1,0 +1,43 @@
+;;clisp -c paolagiraldo.lsp
+;;Compiling file /home/../paolagiraldo.lsp ...
+;;Wrote file /home/../paolagiraldo.fas
+;;0 errors, 0 warnings
+;;Bye.
+
+(defun read-data (&optional (read-line))
+  (declare (ignore read-line))
+  (let (*read-eval*)
+  (loop :for line = (read-line nil nil)
+  :while line
+  :collect (read-from-string (concatenate 'string "("(write-to-string line)")")))))
+
+(defun split-by-one-space (string)
+  (loop for i = 0 then (1+ j)
+    as j = (position #\Space string :start i)
+    collect (subseq string i j)
+    while j))
+
+(defvar data)
+(setq data (read-data))
+(defvar value)
+(setq value (first (first data)))
+(defvar guesses)
+(setq guesses (split-by-one-space (first (first (cdr data)))))
+(defvar strings)
+(defvar position 0)
+(defvar digits 0)
+(dolist (guess guesses)
+  (setq position 0)
+  (setq digits 0)
+  (loop for num from 0 to 3 do
+    (let ((charValue  (char value num))(charGuess  (char guess num)))
+    (if (find charValue (write-to-string guess))
+      (setq digits (+ digits 1)))
+    (if (string= charValue charGuess)
+      (progn
+      (setq position (+ position 1))
+      (setq digits (- digits 1))))))
+ (FORMAT T "~%~D-~D" position digits)))
+
+;;cat DATA.lst | clisp paolagiraldo.lsp
+;;0-2 1-2 0-1 0-2 1-2 1-0 1-1 2-0 0-1 0-1 0-1

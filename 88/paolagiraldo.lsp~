@@ -1,0 +1,69 @@
+#|$ sblint -v paolagiraldo.lsp
+[INFO] Lint file paolagiraldo.lsp
+
+$ clisp -c paolagiraldo.lsp
+Compiling file /home/../paolagiraldo.lsp ...
+Wrote file /home/../paolagiraldo.fas
+0 errors, 0 warnings
+Bye.
+|#
+
+(defun read-data (&optional (read-line))
+  (declare (ignore read-line))
+  (let (*read-eval*)
+    (loop :for line = (read-line nil nil)
+    :while line
+    :collect (read-from-string (concatenate 'string "(" line ")" )))))
+
+(defun partition (array left right)
+  (FORMAT T "~%~D-~D" left right)
+  (let ((lt) (rt) (dir) (pivot))
+    (setq lt left)
+    (setq rt right)
+    (setq dir "left")
+    (setq pivot (nth left array))
+    (loop while (< lt rt) do
+      (if (string= dir "left")
+        (progn
+          (if (> (nth rt array) pivot)
+            (setq rt (- rt 1))
+            (progn
+              (setf (nth lt array) (nth rt array))
+              (setq lt (+ lt 1))
+              (setq dir "right"))))
+      (progn
+        (if (< (nth lt array) pivot)
+          (setq lt (+ lt 1))
+          (progn
+            (setf (nth rt array) (nth lt array))
+            (setq rt (- rt 1))
+            (setq dir "left"))))))
+
+    (setf (nth lt array) pivot)
+    (block nil
+    (return lt))))
+
+(defun quick-sort (array left right)
+  (let ((pivotPos))
+    (setq pivotPos (partition array left right))
+    (if (> (- pivotPos left) 1)
+      (quick-sort array left (- pivotPos 1) ))
+
+    (if (> (- right pivotPos) 1)
+      (quick-sort array (+ pivotPos 1) right))))
+
+(defvar data)
+(setq data (first (cdr (read-data))))
+(print data)
+(quick-sort data 0 (- (length data) 1))
+
+#|
+$ cat DATA.lst | clisp paolagiraldo.lsp
+0-118 0-86 0-57 0-31 0-25 0-5 0-3 0-1 7-25 7-13 7-9 11-13 11-12 15-25 15-16
+18-25 18-22 19-22 21-22 24-25 27-31 27-30 29-30 33-57 33-50 33-44 35-44 35-36
+38-44 39-44 39-43 39-42 39-40 46-50 47-50 48-50 52-57 53-57 53-56 54-56 59-86
+59-67 59-60 62-67 64-67 66-67 69-86 70-86 70-71 73-86 74-86 74-83 75-83 76-83
+76-78 80-83 82-83 85-86 88-118 88-116 88-89 91-116 91-105 91-99 91-97 93-97
+93-96 95-96 101-105 103-105 103-104 107-116 107-108 110-116 111-116 111-112
+114-116
+|#

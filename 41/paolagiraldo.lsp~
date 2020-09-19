@@ -1,0 +1,13 @@
+(defun read-data (&optional (file (read-line)))
+  "Returns the numerical data in FILE as a list of lists."
+  (with-open-file (data file)
+    (let (*read-eval*)
+      (loop :for line = (read-line data nil nil)
+            :while line
+            :collect (read-from-string (concatenate 'string "(" line ")"))))))
+
+
+(setq data (cdr (read-data "DATA.lst")))
+(print data)
+(dolist (item (cdr data))
+  (print (second (sort item #'<))))

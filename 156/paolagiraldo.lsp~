@@ -1,0 +1,43 @@
+#|$ sblint -v paolagiraldo.lsp
+[INFO] Lint file paolagiraldo.lsp
+
+$ clisp -c paolagiraldo.lsp
+Compiling file /home/../paolagiraldo.lsp ...
+Wrote file /home/../paolagiraldo.fas
+0 errors, 0 warnings
+Bye.
+|#
+
+(defun read-data (&optional (read-line))
+  (declare (ignore read-line))
+  (let (*read-eval*)
+    (loop :for line = (read-line nil nil)
+    :while line
+    :collect (read-from-string (concatenate 'string "(" line ")")))))
+
+
+(defun select-sort (data)
+  (let ((maxi) (pos) (latest (first (last data))) (sorted) (dataAux))
+  (setq sorted (copy-list data))
+  (setq maxi (first (sort sorted #'>)))
+  (setq pos (position maxi data))
+  (setq dataAux (copy-list data))
+  (setf (nth (- (length data) 1) dataAux) maxi)
+  (setf (nth pos dataAux) latest)
+  (print pos)
+  (if (> (length data) 2)
+      (select-sort (subseq dataAux 0 (- (length data) 1))))
+  ))
+
+(defvar data)
+(setq data (first (cdr (read-data))))
+(select-sort data)
+
+#|
+$ cat DATA.lst | clisp paolagiraldo.lsp
+125 88 113 113 20 90 72 112 76 52 69 26 64 25 84 1 7 67 60 21 39 63 2 78 51 64
+87 35 2 35 22 88 4 15 18 71 28 5 73 78 32 8 8 27 19 20 71 3 76 37 42 54 16 25
+20 52 29 20 32 45 36 0 16 57 31 61 27 8 30 16 58 48 20 37 30 11 43 0 26 12 1
+24 41 33 35 26 41 39 13 31 19 21 25 3 23 11 23 3 28 19 11 22 0 10 8 14 22 10 6
+12 15 7 6 6 4 8 9 1 8 6 0 3 5 5 1 1 2 0
+|#

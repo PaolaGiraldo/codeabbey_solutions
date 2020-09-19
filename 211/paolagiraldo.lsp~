@@ -1,0 +1,35 @@
+#|$ sblint -v paolagiraldo.lsp
+[INFO] Lint file paolagiraldo.lsp
+
+$ clisp -c paolagiraldo.lsp
+Compiling file /home/../paolagiraldo.lsp ...
+Wrote file /home/../paolagiraldo.fas
+0 errors, 0 warnings
+Bye.
+|#
+
+(defun read-data (&optional (read-line))
+  (declare (ignore read-line))
+  (let (*read-eval*)
+    (loop :for line = (read-line nil nil)
+    :while line
+    :collect (read-from-string (concatenate 'string "(" line ")" )))))
+
+(defun note-calculator (data)
+  (let ((notes) (value) (note) (octave))
+    (setq notes '(C C# D D# E F F# G G# A A# B))
+
+   (dolist (freq data)
+     (setq value (+ (* (+ (log (/ (* freq 1024) 440) 2) (/ 1 24)) 12) 9))
+     (setq note (nth (floor (mod value 12)) notes))
+     (setq octave (floor (- (/ value 12) 6)))
+     (format T "~%~D~D" note octave))))
+
+(defvar data)
+(setq data (first (cdr (read-data))))
+(note-calculator data)
+
+#|
+$ cat DATA.lst | clisp paolagiraldo.lsp
+B2 A#5 G#5 G#3 C4 A4 D5 C3 E2 F#2 A3 C#4 G#4 F#1 F2 A#3 G3 G#1
+|#

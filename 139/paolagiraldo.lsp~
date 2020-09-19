@@ -1,0 +1,91 @@
+#|$ sblint -v paolagiraldo.lsp
+[INFO] Lint file paolagiraldo.lsp
+
+$ clisp -c paolagiraldo.lsp
+Compiling file /home/../paolagiraldo.lsp ...
+Wrote file /home/../paolagiraldo.fas
+0 errors, 0 warnings
+Bye.
+|#
+
+(defun read-data (&optional (read-line))
+  (declare (ignore read-line))
+  (let (*read-eval*)
+    (loop :for line = (read-line nil nil)
+       :while line
+       :collect (read-from-string (concatenate 'string
+       (write-to-string line :base 16) )))))
+
+(defun find-max (numList)
+(let ((reversed) (max) (maxIndex))
+  (setq reversed (reverse numList))
+  (setq max (apply 'max numList))
+  (setq maxIndex (position max reversed))
+  (if (= max (first numList))
+    (progn
+      (setf (nth maxIndex reversed) (first (cdr numList)))
+      (setf (nth (- (length reversed) 2) reversed) max))
+    (progn
+      (setf (nth maxIndex reversed) (first numList))
+      (setf (nth (1- (length reversed)) reversed) max)))
+
+  (block nil
+    (return (reverse reversed)))))
+
+(defun find-min (numList)
+  (let ((noZeros) (reversed) (min) (minIndex) (firstNoZero) (posRep))
+  (setq noZeros (delete 0 (copy-list numList)))
+  (setq reversed (reverse numList))
+  (setq min (apply 'min noZeros))
+  (if (= min (first numList))
+    (progn
+      (setq min (apply 'min (cdr numList)))
+      (setq minIndex (position min reversed))
+      (setq firstNoZero (first (cdr noZeros)))
+      (setq posRep (- (length numList) (1+ (position firstnoZero numList))))
+      (setf (nth posRep reversed) min)
+      (setf (nth minIndex reversed) firstNoZero))
+    (progn
+      (setq minIndex (position min reversed))
+      (setf (nth minIndex reversed) (first numList))
+      (setf (nth (1- (length reversed)) reversed) min)))
+
+  (block nil
+    (return (reverse reversed)))))
+
+(defun calc-weigths (data)
+  (let ((numList))
+  (setf *print-base* 16)
+  (dolist (num data)
+    (setq numList (map 'list (lambda (c)(or (digit-char-p c 16) nil))
+      (prin1-to-string num)))
+    (setq numList (subseq numList 1 (- (length numList) 1)))
+    (format T "~%~{~a~} ~{~a~}" (find-min numList) (find-max numList)))))
+
+(defvar data)
+(setq data (cdr (read-data)))
+(calc-weigths data)
+
+#|
+$ cat DATA.lst | clisp paolagiraldo.lsp
+264CC36AF9036E3 F62CC36A49036E3
+1A4741C9F89C83E FA4741C9389C81E
+11844FE48F7FDB8F557A7436CD F1844FE48F7FDB18557A7436CD
+1F11729C68AB5A30 F511729C68AB1A30
+11737FEE3E4FF74E856AF2 F1737FEE314FF74E856AE2
+2DC9709FEB7286 FDC97098EB7226
+102491CE9446F F92491CE04461
+18C5E5CEFCCA3FCAF F1C5E5CEFCCA3FCA8
+121D3DC420A242318165F64C05B F21D3DC420A242318165461C05B
+1BA4DC219E5CFFE4215A3C032FF FFA4DC219E5CFFE4215A3C0321B
+4B076AB76D50BBCB DB076AB46750BBCB
+1FDC4800832A251E584F496BF FFDC4800832A251E584F4961B
+1A385E73BCCBC4EFFD40 FA385E73BCCBC4EFD140
+194ADE0FD6C7A5D8D039DF62E6AFA2 F94ADE0FD6C7A5D8D039DF62E61AA2
+2C4FA2F9F6670C4995C35CA4A069B8 FC4FA2F956670C4995C32CA4A069B8
+10EFF0E845F75BCE52B9473 F4EFF0E805175BCE52B9473
+20FBE85ED3EC4D5424C8387 F32BE85ED3EC4D5424C8087
+12EFA19C59841D3F1BC F2EFA19C59841D3B11C
+119E6696E0C93A9EC2B EE916696E0C93A91C2B
+136D19C2B979ABB D36B19C2B979A1B
+|#

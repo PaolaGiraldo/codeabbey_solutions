@@ -1,0 +1,66 @@
+#|$ sblint -v paolagiraldo.lsp
+[INFO] Lint file paolagiraldo.lsp
+
+$ clisp -c paolagiraldo.lsp
+Compiling file /home/../paolagiraldo.lsp ...
+Wrote file /home/../paolagiraldo.fas
+0 errors, 0 warnings
+Bye.
+|#
+
+(defun read-data (&optional (read-line))
+  (declare (ignore read-line))
+  (let (*read-eval*)
+    (loop :for line = (read-line nil nil)
+    :while line
+    :collect (read-from-string (concatenate 'string "("
+      (write-to-string line) ")" )))))
+
+(defun list-to-string (lst)
+  (format nil "~{~A~}" lst))
+
+(defun number-to-list (n)
+  (loop for c across (write-to-string n) collect (digit-char-p c)))
+
+(defun count-bits (numList)
+  (let ((count) (countList))
+    (setq count 1)
+    (loop for pos from 1 to  (length numList) do
+	 (if (and (< pos (length numList)) (= (nth pos numList)
+               (nth (1- pos) numList)))
+        (setq count (1+ count))
+	(progn
+	  (setq countList (append countList (list count)))
+	  (setq count 1))))
+    (print countList)
+    (block nil
+      (return countList))
+
+
+
+
+    ) )
+
+
+(defun look-n-say (num)
+  ;;(print num)
+  (let ((numList) (count))
+    (setq numList (delete nil (number-to-list num)))
+    (print numList)
+    (count-bits numList)
+    
+   
+
+
+    ))
+
+
+
+(defvar data)
+(setq data (caar (read-data)))
+(look-n-say data)
+
+#|
+$ cat DATA.lst | clisp paolagiraldo.lsp
+
+|#

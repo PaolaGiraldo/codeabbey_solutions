@@ -1,0 +1,25 @@
+;;clisp -c paolagiraldo.lsp
+;;Compilando fichero /home/../paolagiraldo.lsp ...
+;;Fichero escrito /home/../paolagiraldo.fas
+;;0 errores, 0 advertencias
+;;Adiós.
+
+(defun read-data (&optional (read-line))
+  (declare (ignore read-line))
+  (let (*read-eval*)
+      (loop :for line = (read-line nil nil)
+            :while line
+            :collect (read-from-string (concatenate 'string "(" line ")")))))
+(defvar data)
+(defvar legs)
+(setq data (cdr (read-data)))
+;;(let (data '1) (print data))
+(dolist (item data)
+  (setq legs (+ (expt (first item) 2) (expt (second item) 2)))
+  (COND ((> legs (expt (third item) 2)) (print 'A))
+    ((< legs (expt (third item) 2)) (print 'O))
+    (T (print 'R))))
+
+;;echo DATA.lst | clisp paolagiraldo.lsp
+;;R  O  R  O  O  O  A  A  O  A  A  A  O  R  O  R  O  R  A  O  R  O  O  R
+;;O  R
