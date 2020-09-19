@@ -1,2 +1,2 @@
-# codeabbey_solutions
+# Codeabbey Solutions
 Solutions to Codeabbey problems
